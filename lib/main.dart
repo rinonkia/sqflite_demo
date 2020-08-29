@@ -31,8 +31,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _textController = TextEditingController();
+  TextEditingController _textController;
+
   @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: EdgeInsets.symmetric(horizontal: 24.0),
           children: <Widget>[
             SizedBox(height: 80.0),
-            TextField(
+            TextFormField(
               controller: _textController,
               decoration: InputDecoration(
                 filled: true,
@@ -114,7 +120,16 @@ class _ListPageState extends State<ListPage> {
             ListTile(
               title: Text(inputText.getBody),
               subtitle: Text(inputText.getUpdatedAt.toString()),
-              onTap: () => {},
+              onTap: () => {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => EditTextPage(
+                      inputText: inputText,
+                    ),
+                  ),
+                ),
+              },
               onLongPress: () => showDialog(
                 context: context,
                 builder: (context) {
@@ -155,6 +170,63 @@ class _ListPageState extends State<ListPage> {
           ],
         );
       },
+    );
+  }
+}
+
+class EditTextPage extends StatefulWidget {
+  EditTextPage({Key key, this.inputText}) : super(key: key);
+
+  final InputText inputText;
+  @override
+  _EditTextPageState createState() => _EditTextPageState();
+}
+
+class _EditTextPageState extends State<EditTextPage> {
+  TextEditingController _textController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController(text: widget.inputText.getBody);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("edit text page")),
+      body: Center(
+        child: ListView(
+          padding: EdgeInsets.symmetric(horizontal: 24.0),
+          children: <Widget>[
+            SizedBox(height: 80.0),
+            TextFormField(
+              controller: _textController,
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter text';
+                } else {
+                  return null;
+                }
+              },
+              decoration: InputDecoration(
+                filled: true,
+                labelText: 'input',
+              ),
+            ),
+            SizedBox(height: 20.0),
+            RaisedButton(
+              child: Text('送信'),
+              onPressed: () => {
+                InputTextRepository.update(
+                  id: widget.inputText.getId,
+                  text: _textController.text,
+                ),
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
