@@ -6,10 +6,11 @@ class InputTextRepository {
   static DBProvider instance = DBProvider.instance;
 
   static Future<InputText> create(String text) async {
+    DateTime now = DateTime.now();
     final Map<String, dynamic> row = {
       'body': text,
-      'created_at': 'test',
-      'updated_at': 'test',
+      'created_at': now.toString(),
+      'updated_at': now.toString(),
     };
 
     final db = await instance.database;

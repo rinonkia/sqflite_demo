@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite_demo/db/input_text_repository.dart';
 
 void main() {
   runApp(MyApp());
@@ -51,7 +52,9 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 20.0),
             RaisedButton(
               child: Text('送信'),
-              onPressed: () => {print('test')},
+              onPressed: () => {
+                InputTextRepository.create(_textController.text),
+              },
             ),
           ],
         ),

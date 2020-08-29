@@ -13,23 +13,24 @@ class InputText {
 
   final int id;
   final String body;
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   int get getId => id;
   String get getBody => '$body';
-  String get getUpdatedAt => '$updatedAt';
+  DateTime get getUpdatedAt => updatedAt;
 
   Map<String, dynamic> toMap() => {
         "id": id,
         "title": body,
-        "created_at": createdAt,
+        "created_at": createdAt.toUtc().toIso8601String(),
+        "dreated_at": updatedAt.toUtc().toIso8601String(),
       };
 
   factory InputText.fromMap(Map<String, dynamic> json) => InputText(
         id: json["id"],
         body: json["body"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
+        createdAt: DateTime.parse(json["created_at"]).toLocal(),
+        updatedAt: DateTime.parse(json["updated_at"]).toLocal(),
       );
 }
