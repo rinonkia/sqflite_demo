@@ -104,16 +104,52 @@ class _ListPageState extends State<ListPage> {
   }
 
   Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
-    List<InputText> values = snapshot.data;
+    List<InputText> inputTextList = snapshot.data;
     return new ListView.builder(
-      itemCount: values.length,
+      itemCount: inputTextList.length,
       itemBuilder: (BuildContext context, int index) {
-        InputText value = values[index];
+        InputText inputText = inputTextList[index];
         return Column(
           children: <Widget>[
             ListTile(
-              title: Text(value.getBody),
-              subtitle: Text(value.getUpdatedAt.toString()),
+              title: Text(inputText.getBody),
+              subtitle: Text(inputText.getUpdatedAt.toString()),
+              onTap: () => {},
+              onLongPress: () => showDialog(
+                context: context,
+                builder: (context) {
+                  return SimpleDialog(
+                    backgroundColor: Colors.grey,
+                    children: <Widget>[
+                      SimpleDialogOption(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          "編集する",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                          ),
+                        ),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () {
+                          setState(() {
+                            InputTextRepository.delete(inputText.id);
+                            print('deleted');
+                          });
+                        },
+                        child: Text(
+                          "削除する",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
             Divider(height: 1.0),
           ],
