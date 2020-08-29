@@ -46,10 +46,17 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.list),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (BuildContext context) => ListPage()),
-            ),
+            onPressed: () async {
+              var draft = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => ListPage(),
+                ),
+              );
+              if (draft != null) {
+                setState(() => _textController.text = draft);
+              }
+            },
           ),
         ],
       ),
@@ -60,6 +67,13 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 80.0),
             TextFormField(
               controller: _textController,
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter text';
+                } else {
+                  return null;
+                }
+              },
               decoration: InputDecoration(
                 filled: true,
                 labelText: 'input',
@@ -68,8 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 20.0),
             RaisedButton(
               child: Text('送信'),
-              onPressed: () => {
-                InputTextRepository.create(_textController.text),
+              onPressed: () {
+                InputTextRepository.create(_textController.text);
+                _textController.clear();
               },
             ),
           ],
@@ -120,15 +135,10 @@ class _ListPageState extends State<ListPage> {
             ListTile(
               title: Text(inputText.getBody),
               subtitle: Text(inputText.getUpdatedAt.toString()),
-              onTap: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => EditTextPage(
-                      inputText: inputText,
-                    ),
-                  ),
-                ),
+              onTap: () {
+                final draftBody = inputText.getBody;
+                InputTextRepository.delete(inputText.getId);
+                Navigator.of(context).pop(draftBody);
               },
               onLongPress: () => showDialog(
                 context: context,
@@ -137,7 +147,13 @@ class _ListPageState extends State<ListPage> {
                     backgroundColor: Colors.grey,
                     children: <Widget>[
                       SimpleDialogOption(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          final draftBody = inputText.getBody;
+                          InputTextRepository.delete(inputText.getId);
+                          // MyHomePageにtextを持っていく（力技っぽい）
+                          Navigator.of(context).pop(draftBody);
+                          Navigator.of(context).pop(draftBody);
+                        },
                         child: Text(
                           "編集する",
                           style: TextStyle(
@@ -151,6 +167,7 @@ class _ListPageState extends State<ListPage> {
                           setState(() {
                             InputTextRepository.delete(inputText.id);
                             print('deleted');
+                            Navigator.of(context).pop();
                           });
                         },
                         child: Text(
