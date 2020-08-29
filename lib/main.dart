@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite_demo/db/input_text_repository.dart';
+import 'package:sqflite_demo/model/input_text.dart';
 
 void main() {
   runApp(MyApp());
@@ -36,6 +37,15 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Sqfite'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.list),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (BuildContext context) => ListPage()),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: ListView(
@@ -59,6 +69,56 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ListPage extends StatefulWidget {
+  @override
+  _ListPageState createState() => _ListPageState();
+}
+
+class _ListPageState extends State<ListPage> {
+  @override
+  Widget build(BuildContext context) {
+    var futureBuilder = FutureBuilder(
+      future: InputTextRepository.getAll(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return Text('loading...');
+          default:
+            if (snapshot.hasError)
+              return Text('Error: ${snapshot.error}');
+            else
+              return createListView(context, snapshot);
+        }
+      },
+    );
+
+    return Scaffold(
+      appBar: AppBar(title: Text("Text List")),
+      body: futureBuilder,
+    );
+  }
+
+  Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
+    List<InputText> values = snapshot.data;
+    return new ListView.builder(
+      itemCount: values.length,
+      itemBuilder: (BuildContext context, int index) {
+        InputText value = values[index];
+        return Column(
+          children: <Widget>[
+            ListTile(
+              title: Text(value.getBody),
+              subtitle: Text(value.getUpdatedAt.toString()),
+            ),
+            Divider(height: 1.0),
+          ],
+        );
+      },
     );
   }
 }
