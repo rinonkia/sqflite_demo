@@ -27,7 +27,7 @@ class DBProvider {
     CREATE TABLE input_text(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       body TEXT NOT NULL,
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     ) ''');
   }

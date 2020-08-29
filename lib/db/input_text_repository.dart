@@ -19,8 +19,8 @@ class InputTextRepository {
     return InputText(
       id: id,
       body: row["body"],
-      createdAt: row["created_at"],
-      updatedAt: row["updated_at"],
+      createdAt: now,
+      updatedAt: now,
     );
   }
 
