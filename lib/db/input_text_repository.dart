@@ -41,6 +41,17 @@ class InputTextRepository {
     return InputText.fromMap(rows.first);
   }
 
+  static Future<int> update({int id, String text}) async {
+    String now = DateTime.now().toString();
+    final row = {
+      'id': id,
+      'body': text,
+      'updated_at': now,
+    };
+    final db = await instance.database;
+    return await db.update(table, row, where: 'id = ?', whereArgs: [id]);
+  }
+
   static Future<int> delete(int id) async {
     final db = await instance.database;
     return db.delete(table, where: 'id = ?', whereArgs: [id]);

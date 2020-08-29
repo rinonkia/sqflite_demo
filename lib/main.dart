@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sqfite'),
+        title: Text('Sqflte'),
         actions: [
           IconButton(
             icon: Icon(Icons.list),
