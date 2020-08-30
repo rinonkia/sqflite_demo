@@ -1,4 +1,3 @@
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_demo/db/db_provider.dart';
 import 'package:sqflite_demo/model/input_text.dart';
 

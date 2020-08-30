@@ -126,8 +126,8 @@ class _ListPageState extends State<ListPage> {
 
   Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
     List<InputText> inputTextList = snapshot.data;
-    return new ListView.builder(
-      itemCount: inputTextList.length,
+    return ListView.builder(
+      itemCount: inputTextList != null ? inputTextList.length : 0,
       itemBuilder: (BuildContext context, int index) {
         InputText inputText = inputTextList[index];
         return Column(
