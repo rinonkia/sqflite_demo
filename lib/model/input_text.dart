@@ -24,7 +24,7 @@ class InputText {
         "id": id,
         "title": body,
         "created_at": createdAt.toUtc().toIso8601String(),
-        "dreated_at": updatedAt.toUtc().toIso8601String(),
+        "updated_at": updatedAt.toUtc().toIso8601String(),
       };
 
   factory InputText.fromMap(Map<String, dynamic> json) => InputText(
