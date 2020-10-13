@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite_demo/db/input_text_repository.dart';
 import 'package:sqflite_demo/model/input_text.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TextData()),
+      ],
+      child: MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -188,5 +196,100 @@ class _ListPageState extends State<ListPage> {
         );
       },
     );
+  }
+}
+
+class TextListPage extends StatelessWidget {
+  const TextListPage({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      shrinkWrap: true,
+      separatorBuilder: (context, index) => Divider(color: Colors.black),
+      itemCount: Provider.of<TextData>(context).textsCount,
+      itemBuilder: (BuildContext context, int index) {
+        return TextListTile(index: index);
+      }
+    );
+  }
+}
+
+class TextListTile extends StatelessWidget {
+  const TextListTile({Key key, @required this.index}) : super(key:key);
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<InputText>(
+      builder: (context, inputText, child) {
+        final currentText = inputText.getBody;
+        return ListTile(
+          title: Text(currentText),
+          onTap: () {
+            final draftBody = inputText.getBody;
+            InputTextRepository.delete(inputText.getId);
+            Navigator.of(context).pop(draftBody);
+          },
+          onLongPress: () =>
+            showDialog(context: context, builder: (context) {
+              return SimpleDialog(
+                backgroundColor: Colors.grey,
+                children: <Widget>[
+                  SimpleDialogOption(
+                    onPressed: () {
+                      final draftBody = inputText.getBody;
+                      InputTextRepository.delete(inputText.getId);
+                      // MyHomePageにtextを持っていく（力技っぽい）
+                      Navigator.of(context).pop(draftBody);
+                      Navigator.of(context).pop(draftBody);
+                    },
+                    child: Text(
+                      "編集する",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () {
+
+                      InputTextRepository.delete(inputText.id);
+                      print('deleted');
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      "削除する",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+          ),
+        );
+      }
+    );
+  }
+}
+
+class TextData with ChangeNotifier {
+  final _texts = <InputText>[];
+
+  List<InputText> get texts => _texts;
+  int get textsCount => _texts.length;
+
+
+  InputText getText(int index) {
+    return _texts[index];
+  }
+
+  void removeText(int index) {
+    _texts.removeAt(index);
+    notifyListeners();
   }
 }
