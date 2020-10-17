@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
               var draft = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => ListPage(),
+                  builder: (BuildContext context) => TextListScreen(),
                 ),
               );
               if (draft != null) {
@@ -102,177 +102,87 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class ListPage extends StatefulWidget {
-  @override
-  _ListPageState createState() => _ListPageState();
-}
+class TextListScreen extends StatelessWidget {
+  const TextListScreen({Key key}) : super(key: key);
 
-class _ListPageState extends State<ListPage> {
   @override
   Widget build(BuildContext context) {
-    var futureBuilder = FutureBuilder(
-      future: InputTextRepository.getAll(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return Text('loading...');
-          default:
-            if (snapshot.hasError)
-              return Text('Error: ${snapshot.error}');
-            else
-              return createListView(context, snapshot);
-        }
-      },
-    );
-
+    print('AAAAAAA');
     return Scaffold(
       appBar: AppBar(title: Text("Text List")),
-      body: futureBuilder,
+      body: TextList(),
     );
   }
+}
 
-  Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
-    List<InputText> inputTextList = snapshot.data;
+class TextList extends StatelessWidget {
+  const TextList({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    print('IIIIIIIII');
     return ListView.builder(
-      itemCount: inputTextList != null ? inputTextList.length : 0,
+      itemCount: InputTextRepository.getCount(),
       itemBuilder: (BuildContext context, int index) {
-        InputText inputText = inputTextList[index];
-        return Column(
-          children: <Widget>[
-            ListTile(
-              title: Text(inputText.getBody),
-              subtitle: Text(inputText.getUpdatedAt.toString()),
-              onTap: () {
-                final draftBody = inputText.getBody;
-                InputTextRepository.delete(inputText.getId);
-                Navigator.of(context).pop(draftBody);
-              },
-              onLongPress: () => showDialog(
-                context: context,
-                builder: (context) {
-                  return SimpleDialog(
-                    backgroundColor: Colors.grey,
-                    children: <Widget>[
-                      SimpleDialogOption(
-                        onPressed: () {
-                          final draftBody = inputText.getBody;
-                          InputTextRepository.delete(inputText.getId);
-                          // MyHomePageにtextを持っていく（力技っぽい）
-                          Navigator.of(context).pop(draftBody);
-                          Navigator.of(context).pop(draftBody);
-                        },
-                        child: Text(
-                          "編集する",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.0,
-                          ),
-                        ),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () {
-                          setState(() {
-                            InputTextRepository.delete(inputText.id);
-                            print('deleted');
-                            Navigator.of(context).pop();
-                          });
-                        },
-                        child: Text(
-                          "削除する",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.0,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-            Divider(height: 1.0),
-          ],
+        print('UUUUUUUU');
+        return FutureProvider<InputText>(
+          create: (context) => InputTextRepository.getAll().then((value) => value[index]),
+          initialData: null,
+          child: Consumer<InputText>(builder: (context, value, child) => _testList(context)),
         );
+      }
+    );
+  }
+
+  Widget _testList(BuildContext context) {
+    final inputText = Provider.of<InputText>(context);
+    return ListTile(
+      title: Text(inputText.getBody),
+      onTap: () {
+        final draftBody = inputText.getBody;
+        InputTextRepository.delete(inputText.getId);
+        Navigator.of(context).pop(draftBody);
       },
-    );
-  }
-}
-
-class TextListPage extends StatelessWidget {
-  const TextListPage({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      shrinkWrap: true,
-      separatorBuilder: (context, index) => Divider(color: Colors.black),
-      itemCount: Provider.of<TextData>(context).textsCount,
-      itemBuilder: (BuildContext context, int index) {
-        return TextListTile(index: index);
-      }
-    );
-  }
-}
-
-class TextListTile extends StatelessWidget {
-  const TextListTile({Key key, @required this.index}) : super(key:key);
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<InputText>(
-      builder: (context, inputText, child) {
-        final currentText = inputText.getBody;
-        return ListTile(
-          title: Text(currentText),
-          onTap: () {
-            final draftBody = inputText.getBody;
-            InputTextRepository.delete(inputText.getId);
-            Navigator.of(context).pop(draftBody);
-          },
-          onLongPress: () =>
-            showDialog(context: context, builder: (context) {
-              return SimpleDialog(
-                backgroundColor: Colors.grey,
-                children: <Widget>[
-                  SimpleDialogOption(
-                    onPressed: () {
-                      final draftBody = inputText.getBody;
-                      InputTextRepository.delete(inputText.getId);
-                      // MyHomePageにtextを持っていく（力技っぽい）
-                      Navigator.of(context).pop(draftBody);
-                      Navigator.of(context).pop(draftBody);
-                    },
-                    child: Text(
-                      "編集する",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18.0,
-                      ),
-                    ),
+      onLongPress: () =>
+        showDialog(context: context, builder: (context) {
+          return SimpleDialog(
+            backgroundColor: Colors.grey,
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () {
+                  final draftBody = inputText.getBody;
+                  InputTextRepository.delete(inputText.getId);
+                  // MyHomePageにtextを持っていく（力技っぽい）
+                  Navigator.of(context).pop(draftBody);
+                  Navigator.of(context).pop(draftBody);
+                },
+                child: Text(
+                  "編集する",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.0,
                   ),
-                  SimpleDialogOption(
-                    onPressed: () {
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
 
-                      InputTextRepository.delete(inputText.id);
-                      print('deleted');
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      "削除する",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18.0,
-                      ),
-                    ),
+                  InputTextRepository.delete(inputText.id);
+                  print('deleted');
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  "削除する",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.0,
                   ),
-                ],
-              );
-            }
-          ),
-        );
-      }
+                ),
+              ),
+            ],
+          );
+        }
+      ),
     );
   }
 }
@@ -281,6 +191,7 @@ class TextData with ChangeNotifier {
   final _texts = <InputText>[];
 
   List<InputText> get texts => _texts;
+
   int get textsCount => _texts.length;
 
 

@@ -1,3 +1,4 @@
+import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_demo/db/db_provider.dart';
 import 'package:sqflite_demo/model/input_text.dart';
 
@@ -33,6 +34,12 @@ class InputTextRepository {
     return rows.map((e) => InputText.fromMap(e)).toList();
   }
 
+  static Future<int> getCount() async {
+    final db = await instance.database;
+    return Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM $table'));
+  }
+
   static Future<InputText> single(int id) async {
     final db = await instance.database;
     final rows = await db.rawQuery('SELECT * FROM $table WHERE id = ?', [id]);
@@ -51,13 +58,6 @@ class InputTextRepository {
     final db = await instance.database;
     return await db.update(table, row, where: 'id = ?', whereArgs: [id]);
   }
-
-  // 今後利用予定
-  // static Future<int> countAll() async {
-  //   final db = await instance.database;
-  //   return Sqflite.firstIntValue(
-  //       await db.rawQuery('SELECT COUNT(*) FROM $table'));
-  // }
 
   static Future<int> delete(int id) async {
     final db = await instance.database;
